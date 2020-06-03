@@ -2,42 +2,35 @@
     <div>
         <div v-pre data="{{qwvalue}}"></div>      
         <el-drawer
-            title="我是标题"
+            title="推荐文章"
             direction="ltr"
             :visible.sync="drawer"
-            :with-header="false"
+            :with-header="true"
             size="50%">
-            <p>
-                案件类型
-                <el-select v-model="sinvalue" clearable  placeholder="请选择">
-                    <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                    </el-option>
-                </el-select>
-            </p>
-            <p>
-                案件来源
-                <el-select v-model="mutvalue" multiple placeholder="请选择">
-                    <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                    </el-option>
-                </el-select>
-            </p>
-            <!-- <p>
-                <span class="demonstration">默认</span>
-                <el-date-picker
-                    v-model="date1"
-                    type="daterange"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期">
-                </el-date-picker>
-            </p> -->
+            <div class="recoroll">
+                <div>
+                    关键词 {{rw}}
+                </div>
+                <ul
+                class="recolist"
+                v-infinite-scroll="load"
+                infinite-scroll-disabled="disabled">
+                    <li 
+                    v-for="(pp,i) in passages" 
+                    :key="i" 
+                    class="recolist-item">
+                        <!-- <el-link 
+                        :href="url" 
+                        target="_blank">
+                        {{pp}}
+                        </el-link> -->
+                        <el-button 
+                        type="text" 
+                        @click="go(pp.id)"
+                        >{{pp.title}}</el-button>
+                    </li>
+                </ul>
+            </div>
         </el-drawer>
         <el-container>
             <el-header>
@@ -45,9 +38,16 @@
                     <el-col :span="24">
                         <div class="grid-content title_clr">
                             <el-button 
-                            slot="append" 
+                            type="text" 
                             v-on:click="Search"
-                            icon="el-icon-search">
+                            >
+                            Home
+                            </el-button>
+                            <el-button 
+                            type="text"
+                            @click="drawer = true" 
+                            >
+                            Recommend
                             </el-button>
                             <!-- <el-input 
                                 class="searchinput" 
@@ -65,7 +65,7 @@
             </el-header>
             <el-main>
                 <div class="roll">
-                    <div
+                    <!-- <div
                     class="list-item">
                         <div
                         style="height:50px;"
@@ -73,16 +73,18 @@
                         <p class="ptitle">{{qwtitle}}</p>
                         <div
                         class="ptext"
+                        v-for="(line,id) in qwvalue" 
+                        :key=id
                         >
-                        {{qwvalue}}
+                        {{line}}
                         </div>
                         <div
                         style="height:100px;"
                         ></div>
                         <el-divider class="divider">
                         </el-divider>
-                    </div>
-                    <!-- <div
+                    </div> -->
+                    <div
                     v-for="(paragragh,id) in qw" 
                     :key="id" 
                     class="list-item">
@@ -97,18 +99,17 @@
                         >
                         {{line}}
                         </div>
-                        <div
+                        <!-- <div
                         class="ptext"
                         >
                         {{paragragh.value}}
-                        </div>
+                        </div> -->
                         <div
                         style="height:100px;"
                         ></div>
                         <el-divider class="divider">
                         </el-divider>
-                    </div> -->
-                    <!-- </div> -->
+                    </div>
                 </div>
             </el-main>
         </el-container>
@@ -121,22 +122,8 @@
 export default {
     data() {
         return {
-            options: [{
-                    value: '选项1',
-                    label: '黄金糕'
-                }, {
-                    value: '选项2',
-                    label: '双皮奶'
-                }, {
-                    value: '选项3',
-                    label: '蚵仔煎'
-                }, {
-                    value: '选项4',
-                    label: '龙须面'
-                }, {
-                    value: '选项5',
-                    label: '北京烤鸭'
-                }],
+            rw:'a',
+            options: [],
             sinvalue: '',
             mutvalue: '',
             date1:'',
@@ -145,8 +132,8 @@ export default {
             ph:"搜索内容",
             count: 10,
             loading: false,
-            qwvalue:'{{qwvalue}}',
-            qwtitle:'{{qwtitle}}',
+            qwvalue:'',
+            qwtitle:'',
             qw:[
 
 // {title:'文首',value:'山东省青岛市黄岛区人民法院\n民事判决书\n（2016）鲁0211民初12571号\n'},
@@ -158,7 +145,9 @@ export default {
 // {title:'文尾',value:'\n审判员张成镇\n二〇一七年三月十三日\n书记员丁钰杰\n'},
 
             ],
-            atext:"原告：青岛天一集团红旗电机有限公司，住所地青岛市黄岛区世纪大道1588号。法定代表人：孙国华，董事长。委托诉讼代理人：朱业华，山东汇正律师事务所律师。被告：青岛市黄岛区第一中学，住所地青岛市黄岛区广州路北段。法定代表人：管仁福，校长。委托诉讼代理人：宋成宝，山东雅圣律师事务所律师",
+            passages:[
+                {title:'名字',id:1003}
+            ]
         }
     },
     computed: {
@@ -169,35 +158,111 @@ export default {
             return this.loading || this.noMore
         }
     },
-    beforeMount(){
-        var value = document.getElementsByTagName('div')[1].getAttribute('data') || '';
-        // var title='QW'
-        // console.log(title)
-        console.log(value)
-        // this.qw=[{title:title,value:value}]
-    },
-    // mounted:function(){
+    // beforeMount(){
+    //     var value = document.getElementsByTagName('div')[1].getAttribute('data') || '';
+    //     // var title='QW'
+    //     // console.log(title)
+    //     console.log(value)
     //     // this.qw=[{title:title,value:value}]
     // },
+    mounted:function(){
+        // this.qw=[{title:title,value:value}]
+        // var pre = window.location.href
+        // pre = pre.split('/')
+        // console.log(pre)
+        // // var id = pre[pre.length()-1]
+        
+
+        this.passages=[]
+        var url='get/'
+        console.log('jump to search' )
+        var req = new XMLHttpRequest();
+        req.open('GET', url, true);
+        req.setRequestHeader("Content-type","application/json");
+        req.send()
+        var vue = this
+        req.onreadystatechange = function () {
+            console.log('response')
+            if (req.readyState == 4 && req.status == 200) {
+                var json = req.responseText;
+                json = JSON.parse(json)
+                console.log(json)
+                if (json['n']==1){
+                    var y= [
+                        '文首',
+                        '当事人',
+                        '诉讼记录',
+                        '案件基本情况',
+                        '判决结果',
+                        '文尾',            
+                    ]
+                    for (var el of y){
+                        var temp = json[el]
+                        temp=temp.split(' ')
+                        console.log(el)
+                        console.log(temp)
+                        vue.qw.push({title:el,value:temp})
+                        console.log(vue.qw)
+                    }
+                }else{
+                    var title = json['title']
+                    var answer = json['value']
+                    answer = answer.split(' ')
+                    vue.qw.push({title:title,value:answer})
+                    vue.qwtitle=title
+                    vue.qwvalue=answer
+                }
+            }
+        };
+
+        var reco='reco/'
+        console.log('reco' )
+        var rreq = new XMLHttpRequest();
+        rreq.open('GET', reco, true);
+        rreq.setRequestHeader("Content-type","application/json");
+        rreq.send()
+        rreq.onreadystatechange = function () {
+            console.log('response')
+            if (rreq.readyState == 4 && rreq.status == 200) {
+                var rjson = rreq.responseText;
+                rjson = JSON.parse(rjson)
+                console.log(rjson)
+                var rpa=rjson['passage']
+                for (var i in rpa){
+                    vue.passages.push(rpa[i])
+                }
+                vue.rw=rjson['rw']
+            }
+        };
+    },
     methods:{
+        go(xmlid){
+            var pre = window.location.host
+            console.log(pre)
+            var url ='//' + pre +'/p/'+xmlid.toString()
+            window.open(url)
+        },
         Search:function () {
             this.loading=false
             this.passages=[]
-            var url='p/search/'
+            // var url='back/'
+            var pre = window.location.host
+            console.log(pre)
             console.log('jump to search' )
-            var req = new XMLHttpRequest();
-            req.open('GET', url, true);
-            req.setRequestHeader("Content-type","application/json");
-            req.send()
-            // var vue = this
-            req.onreadystatechange = function () {
-                console.log('response')
-                if (req.readyState == 4 && req.status == 200) {
-                    var html = req.responseText;
-                    var newWindow = window.open();
-                    newWindow.document.write(html);
-                }
-            };
+            window.open('//'+pre);
+            // var req = new XMLHttpRequest();
+            // req.open('GET', url, true);
+            // req.setRequestHeader("Content-type","application/json");
+            // req.send()
+            // // var vue = this
+            // req.onreadystatechange = function () {
+            //     console.log('response')
+            //     if (req.readyState == 4 && req.status == 200) {
+            //         // var html = req.responseText;
+            //         // var newWindow = window.open();
+            //         // newWindow.document.write(html);
+            //     }
+            // };
         }
     }
 }
@@ -290,5 +355,28 @@ export default {
 		/* vertical-align: middle; */
         margin: 0 auto;
         width: 70%;
+    }
+    .recoroll{
+        height: 100%;
+        overflow: auto;
+
+    }
+    .recolist{
+        height: 100%;
+        width: 80%;
+        margin: 0 auto;
+        padding: 0;
+        overflow:auto;
+
+    }
+    .recolist-item{
+        height: 10%;
+        width: 70%;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        list-style: none;
+        margin: 0 15% 0 15%;
     }
 </style>

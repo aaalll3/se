@@ -21,14 +21,20 @@
 
 # ww.writelines(lines)
 
-def cmp(p1,p2):
-    if p1[1]<p2[1]:
-        return 1
-    elif p1[1]>p2[1]:
-        return -1
-    else:
-        return 0
+# def cmp(p1,p2):
+#     if p1[1]<p2[1]:
+#         return 1
+#     elif p1[1]>p2[1]:
+#         return -1
+#     else:
+#         return 0
 
-v=[(0,2),(0,3),(1,4)]
-v=sorted(v,key=functools.cmp_to_key(cmp))
-print(v)
+# v=[(0,2),(0,3),(1,4)]
+# v=sorted(v,key=functools.cmp_to_key(cmp))
+# print(v)
+
+import re
+
+ss ='．Msoomal{magi-top：0cm；magi-bottom：0px}'
+
+print(re.sub('[^\u4e00-\u9fa5]*', '',ss,count=1))

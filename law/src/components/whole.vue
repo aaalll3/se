@@ -98,21 +98,28 @@
                 <el-row>
                     <el-col :span="24">
                         <div class="grid-content title_clr">
+                            <el-button
+                            @click="drawer = true" 
+                            icon="el-icon-collection-tag"
+                            circle
+                            class="ib"
+                            >
+                            </el-button>
                             <el-input 
+                                :type="len"
                                 class="searchinput" 
                                 v-model="input" 
                                 placeholder="搜索">
-                                    <el-button 
-                                    slot="prepend" 
-                                    @click="drawer = true" 
-                                    icon="el-icon-collection-tag">
-                                    </el-button>
-                                    <el-button 
-                                    slot="append" 
-                                    v-on:click="Search"
-                                    icon="el-icon-search">
-                                    </el-button>
+                                    
                             </el-input>
+                            <el-button 
+
+                            v-on:click="Search"
+                            icon="el-icon-search"
+                            circle
+                            class="ib"
+                            >
+                            </el-button>
                         </div>
                     </el-col>
                 </el-row>
@@ -208,6 +215,13 @@ export default {
         };
     },
     computed: {
+        len(){
+            if (this.input.length>40){
+                return 'textarea'
+            }else{
+                return ''
+            }
+        },
         noMore () {
             return this.count >= 100
         },
@@ -304,13 +318,15 @@ export default {
             // obj['pagen']=this.pagen
             // console.log(JSON.stringify(obj))
             // req.send(JSON.stringify(obj));x
-
+            var pre = window.location.href
+            console.log(pre)
+            url = pre + url
             req.onreadystatechange = function () {
                 console.log('response')
                 if (req.readyState == 4 && req.status == 200) {
-                    var html = req.responseText;
-                    var newWindow = window.open();
-                    newWindow.document.write(html);
+                    // var html = req.responseText;
+                    window.open(url);
+                    // newWindow.document.write(html);
                 }
             }
         }
@@ -350,9 +366,9 @@ export default {
     .searchinput{
         margin-top:10px;
         margin-bottom:10px;
-
-        height: 40px;
-        width:95%;
+        max-width: 80%;
+        min-height: 40px;
+        /* width:95%; */
     }
     .roll{
         height: 100%;
@@ -375,5 +391,8 @@ export default {
         list-style: none;
         width:70%;
         margin: 0 15% 0 15%;
+    }
+    .ib{
+        margin: 0 20px 0 20px;
     }
 </style>

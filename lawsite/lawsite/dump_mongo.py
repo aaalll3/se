@@ -9,6 +9,7 @@ import jieba
 from sklearn.feature_extraction.text import TfidfVectorizer
 import functools
 import json
+import re
 
 class MS(object):
     def __init__(self):
@@ -307,23 +308,61 @@ class MS(object):
         return ex_set
 
     def get_passage(self,xmlpath):
+        x = [
+            'WS'
+            ,'DSR'
+            ,'SSJL'
+            ,'AJJBQK'
+            ,'PJJG'
+            ,'WW'
+        ]
+        y= {
+            'WS':'文首',
+            'DSR':'当事人',
+            'SSJL':'诉讼记录',
+            'AJJBQK':'案件基本情况',
+            'PJJG':'判决结果',
+            'WW':'文尾',            
+        }
         ans={}
         xmlfile = open(xmlpath)
         soup = BeautifulSoup(xmlfile,'xml')
         found = soup.find('QW')
         if found.attrs.__contains__('oValue'):
+            print('n')
+            ans['n']=1
             tt = str(found['oValue'])
-            ans['title']='QW'
+            tt = re.sub('[^\u4e00-\u9fa5]*', '',tt,count=1)
+            ans['title']='全文'
             ans['value']=tt
+            tagfound = found.findAll(x)
+            for i in tagfound:
+                tmp = re.sub('[^\u4e00-\u9fa5]*', '',i['value'],count=1)
+                ans[y[i.name]]=tmp
+                # print(i.name,i['value'])
+            
         elif found.attrs.__contains__('value'):
+            print('a')
+            ans['n']=0
             tt = str(found['value'])
-            ans['title']='QW'
+            ans['title']='全文'
+            tt = re.sub(r'{(\s+\w)*}', '', tt)
             ans['value']=tt
+        # print(ans)
         return ans
 
 if __name__=='__main__':
     ms = MS()
-    ms.link()
+    ms.link() 
+
+    xmls=[
+        './xml_1/51669f8f-a108-4c1e-a93e-49b100d8defb/030133604cdc9906e540680165edee70827.xml',
+        './xml_2/646a8497-7a4e-4bee-a905-65c111f3ecc6/01716664979222cd7c7d58a401c5b077732.xml',
+        './xml_3/27570e96-a17a-40ba-a71f-e27b38830501/053e38c3776007226106863bd5f4385e38c.xml',
+        './xml_4/206809AAF9A7218B23DF879C130F5A49.xml',
+        ]
+    for xml in xmls:
+        ms.get_passage(xml)
     # batch =[]
     # for x in ms.wscl.find():
     #     batch.append[x[]]

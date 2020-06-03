@@ -26,4 +26,7 @@ urlpatterns = [
     path('p/lawinit/',views.lawinit),
     path('p/search/',views.jumpsearch),
     path('p/<int:idx>/',views.page),
+    path('p/<int:idx>/get/',views.content),
+    path('p/<int:idx>/back/',views.jumpsearch),
+    path('p/<int:idx>/reco/',views.get_reco),
 ]
